@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background: #fff0f3;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(255,182,193,0.3);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ffe6ea;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: #ff69b4;
+        }
+
+        .tab.active {
+            border-bottom: 2px solid #ff69b4;
+            color: #ff1493;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .journal-input {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ffb6c1;
+            border-radius: 5px;
+            resize: vertical;
+        }
+
+        .entries {
+            margin-top: 20px;
+        }
+
+        .entry {
+            background: #fff0f5;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ffe4e1;
+        }
+
+        .entry-date {
+            color: #db7093;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        button {
+            background: #ff69b4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #ff1493;
+        }
+
+        .card {
+            background: #fff0f5;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            text-align: center;
+            border: 1px solid #ffe4e1;
+        }
+
+        .quote-text {
+            font-size: 18px;
+            margin: 15px 0;
+            font-style: italic;
+            color: #c71585;
+        }
+
+        .dice-result {
+            font-size: 24px;
+            margin: 10px 0;
+            color: #ff1493;
+        }
+
+        .treat-text {
+            margin: 10px 0;
+            padding: 10px;
+            background: #ffe4e1;
+            border-radius: 5px;
+            display: none;
+            color: #c71585;
+        }
+
+        .distractions {
+            display: grid;
+            gap: 20px;
+        }
+
+        h3 {
+            color: #ff1493;
+        }
+    </style>
+</head>
+<!-- Rest of the HTML and JavaScript remains exactly the same -->
+<body>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('write')">Write</button>
+            <button class="tab" onclick="showTab('entries')">Entries</button>
+            <button class="tab" onclick="showTab('distractions')">Distractions</button>
+        </div>
+
+        <div id="write" class="tab-content active">
+            <textarea class="journal-input" placeholder="how is my baby feeling whats wrong?"></textarea>
+            <button onclick="saveEntry()">Save Entry</button>
+        </div>
+
+        <div id="entries" class="tab-content">
+            <div class="entries"></div>
+        </div>
+
+        <div id="distractions" class="tab-content">
+            <div class="distractions">
+                <div class="card">
+                    <h3>Daily Quote</h3>
+                    <div class="quote-text">Click for inspiration!</div>
+                    <button onclick="getQuote()">New Quote</button>
+                </div>
+
+                <div class="card">
+                    <h3>Roll for a Special Date!</h3>
+                    <div class="dice-result">?</div>
+                    <div class="treat-text"></div>
+                    <button onclick="rollDice()">Roll Dice</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const treats = {
+            1: "movie night with your favorite film and homemade popcorn 🎬🍿",
+            2: "a candlelit bubble bath with your favorite music ",
+            3: "your choice of restaurant for a dinner date ",
+            4: "a full day trip to anywhere within 2 hours drive ",
+            5: "shopping spree for that item you've been eyeing ",
+            6: "weekend getaway to wherever you want to"
+        };
+
+        const quotes = [
+            "you are stronger than you know baby",
+            "im so proud of u for making another journal entry",
+            "you've got this baby",
+            "i love you so much",
+            "my amazing pretty pretty girl ",
+            "your smile lights up my day",
+            "you make my world so much better just by being you ",
+            "today is full of possibilities ",
+            "you are loved beyond measure jaan",
+            "your potential is endless jaan im so proud of u",
+            "its just a bad day not a bad life",
+            "im going to eat you kkitni pyaari haii",
+            "smile a little you look even prettier",
+            "i hate your mom too",
+            "one day it will just be me and you and our healthy life and family i promise ill be by your side forever",
+            "YOU WILL MAKE IT MY BABY!!!!",
+            "go draw something baby or call me you know im always there for you",
+            "call me if its getting bad okay",
+            "again call me if its really baddd im always here for you this is just an idea of me talking to you dont forget im actually there for you"
+        ];
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function saveEntry() {
+            const input = document.querySelector('.journal-input');
+            const text = input.value.trim();
+            if (text) {
+                const entry = {
+                    text,
+                    date: new Date().toLocaleString()
+                };
+                const entries = JSON.parse(localStorage.getItem('entries') || '[]');
+                entries.unshift(entry);
+                localStorage.setItem('entries', JSON.stringify(entries));
+                input.value = '';
+                displayEntries();
+            }
+        }
+
+        function displayEntries() {
+            const entries = JSON.parse(localStorage.getItem('entries') || '[]');
+            const entriesDiv = document.querySelector('.entries');
+            entriesDiv.innerHTML = entries.map(entry => `
+                <div class="entry">
+                    <div class="entry-date">${entry.date}</div>
+                    <div>${entry.text}</div>
+                </div>
+            `).join('');
+        }
+
+        function rollDice() {
+            const result = Math.floor(Math.random() * 6) + 1;
+            const diceResult = document.querySelector('.dice-result');
+            const treatText = document.querySelector('.treat-text');
+            
+            diceResult.textContent = `You rolled: ${result}`;
+            treatText.textContent = treats[result];
+            treatText.style.display = 'block';
+        }
+
+        function getQuote() {
+            const randomIndex = Math.floor(Math.random() * quotes.length);
+            document.querySelector('.quote-text').textContent = quotes[randomIndex];
+        }
+
+        // Load entries on page load
+        displayEntries();
+    </script>
+</body>
+</html>
